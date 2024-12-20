@@ -11,14 +11,18 @@ Actually, it's just an old build of my project, so I think it might be a good id
 ### Examples
 ```python3
 import asyncio
+
 from loguru import logger
 from typing import Callable
+
 from server.handlers import setup_handlers
 from server.middlewares import setup_middlewares
+
 from aiosocket import Dispatcher, Server
 from aiosocket.models import RequestModel, Session, CustomSession
 from aiosocket.models.handler import BaseHandler
 from aiosocket.models.middleware import BaseMiddleware
+
 class LoggingMiddleware(BaseMiddleware):
     async def process(
         self,
@@ -41,6 +45,7 @@ class LoggingMiddleware(BaseMiddleware):
             request_data=request_data,
             handler=handler,
         )
+
 class LoginHandler(BaseHandler):
     async def handle(
         self,
@@ -70,16 +75,19 @@ class LoginHandler(BaseHandler):
                 message="Failed, lil bro",
                 type="auth_failed",
             )
+
     def authenticate(self, request_data: RequestModel) -> bool:
         """
         auth check
         """
         return request_data.data.get("username") == "admin"
+
 class AnotherHandler(BaseHandler):
     async def handle(self, session, reader, writer, request_data):
         response_message = "Another handler response"
         writer.write(response_message.encode())
         await writer.drain()
+
 async def main() -> None:
     dispatcher = Dispatcher(session_class=CustomSession)
     server = Server(host="127.0.0.1", port=8888, dispatcher=dispatcher)
@@ -89,6 +97,7 @@ async def main() -> None:
     test_router = server.dispatcher.create_router("test")
     test_router.add_handler(LoginHandler(), name="login_handler")
     await server.run_server()
+
 if __name__ == "__main__":
     asyncio.run(main())
 ```
